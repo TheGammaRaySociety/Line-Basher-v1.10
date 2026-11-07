@@ -70,7 +70,9 @@ class AppStoreReviewCoordinator: NSObject {
     //Request the review. Apple will handle showing this only once so you can keep calling it.
     //Just because you call it the first time, Apple may not show it.
     func requestReview() {
-        SKStoreReviewController.requestReview()
+        if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
+        }
     }
 }
 

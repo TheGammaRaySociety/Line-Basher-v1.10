@@ -10,11 +10,11 @@ import UIKit
 import StoreKit
 import GoogleMobileAds
 
-class BashTitleViewController: UIViewController, GADBannerViewDelegate, UITextFieldDelegate, GADInterstitialDelegate, UITableViewDelegate
+class BashTitleViewController: UIViewController, BannerViewDelegate, UITextFieldDelegate, UITableViewDelegate
 {
 
-    @IBOutlet weak var banner: GADBannerView!
-    var interstitial: GADInterstitial!
+    @IBOutlet weak var banner: BannerView!
+    var interstitial: InterstitialAd?
     var canShowAds: Bool = true
     var interstitialAdReady: Bool = false
     
@@ -39,12 +39,9 @@ class BashTitleViewController: UIViewController, GADBannerViewDelegate, UITextFi
         banner.delegate = self
         banner.adUnitID = "ca-app-pub-8101436191593741/5144797310"
         banner.rootViewController = self
-        banner.load(GADRequest())
+        banner.load(Request())
         
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/6621530511")
-        interstitial.delegate = self
-        let request = GADRequest()
-        interstitial.load(request)
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
         
         LineBasherProducts.store.requestProducts(completionHandler: {_,_ in })
         
@@ -147,7 +144,7 @@ class BashTitleViewController: UIViewController, GADBannerViewDelegate, UITextFi
     }
     
     //MARK: Ad MobStuff
-    func adViewDidReceiveAd(_ bannerView: GADBannerView)
+    func bannerViewDidReceiveAd(_ bannerView: BannerView)
     {
         if canShowAds
         {
@@ -158,28 +155,33 @@ class BashTitleViewController: UIViewController, GADBannerViewDelegate, UITextFi
         }
     }
     
-    func interstitialDidReceiveAd(_ ad: GADInterstitial)
-    {
-        interstitialAdReady = true
-    }
-    
-    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError)
+    func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error)
     {
         banner.isHidden = true
     }
     
-    func createFullScreenAd() -> GADInterstitial
+    func loadFullScreenAd(adUnitID: String)
     {
-        let interstitialAd = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/6621530511")
-        interstitialAd.load(GADRequest())
-        interstitialAd.delegate = self
-        return interstitialAd
+        Task { @MainActor [weak self] in
+            do {
+                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
+                self?.interstitial = ad
+                self?.interstitialAdReady = true
+            } catch {
+                self?.interstitialAdReady = false
+            }
+        }
+    }
+    
+    func createFullScreenAd()
+    {
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
     }
     
     func showAdsInGame ()
     {
         canShowAds = true
-        banner.load(GADRequest())
+        banner.load(Request())
     }
     
     func hideAdsInGame ()
@@ -190,12 +192,11 @@ class BashTitleViewController: UIViewController, GADBannerViewDelegate, UITextFi
     
     func showFullScreenAd ()
     {
-        if (interstitial.isReady)
-        {
-            interstitialAdReady = false
-            interstitial.present(fromRootViewController: self)
-            interstitial = createFullScreenAd()
-        }
+        guard let ad = interstitial else { return }
+        interstitial = nil
+        interstitialAdReady = false
+        ad.present(from: self)
+        createFullScreenAd()
     }
 }
 
@@ -255,7 +256,7 @@ extension BashTitleViewController: UITableViewDataSource
         return cell
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath)
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath)
     {        
         let work = dbObj.listOfWorks[indexPath.row]
         let refWork = work.name
@@ -343,7 +344,7 @@ extension BashTitleViewController: UITableViewDataSource
         toggleArrangeWorks()
     }
     
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle
     {
         if indexPath.row == 0
         {

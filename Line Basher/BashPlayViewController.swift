@@ -21,7 +21,7 @@ struct voiceVariables
     var volume: Float = 0.5
 }
 
-class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, GADBannerViewDelegate, UITextFieldDelegate, GADInterstitialDelegate
+class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITextFieldDelegate
 {
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
     
@@ -38,7 +38,7 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, GADB
     
     var canShowAds: Bool = true
     var interstitialAdReady: Bool = false
-    var interstitial: GADInterstitial!
+    var interstitial: InterstitialAd?
     
     var listenToTheCues: Bool = false
     var hintCount: Int = 0
@@ -89,12 +89,9 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, GADB
         ///banner.rootViewController = self
         ///banner.load(GADRequest())
         
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/6621530511")
-        interstitial.delegate = self
-        let request = GADRequest()
-        interstitial.load(request)
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
         
-        btnSpeakCue.setTitle("Hear Cues", for: UIControlState.normal)
+        btnSpeakCue.setTitle("Hear Cues", for: UIControl.State.normal)
         appStoreReviewCoordinator.incrementEventCounter()
     }
     
@@ -171,9 +168,8 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, GADB
         
         let audioSession = AVAudioSession.sharedInstance()
         
-        try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        try audioSession.setCategory(.playAndRecord, mode: .measurement)
         //try audioSession.setCategory(AVAudioSessionCategoryRecord)
-        try audioSession.setMode(AVAudioSessionModeMeasurement)
         try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
@@ -524,11 +520,11 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, GADB
         if listenToTheCues
         {
             listenToTheCues = false
-            btnSpeakCue.setTitle("Hear Cues", for: UIControlState.normal)
+            btnSpeakCue.setTitle("Hear Cues", for: UIControl.State.normal)
             speechSynthesizer.stopSpeaking(at: .immediate)
         } else
         {
-            btnSpeakCue.setTitle("Mute Cues", for: UIControlState.normal)
+            btnSpeakCue.setTitle("Mute Cues", for: UIControl.State.normal)
             listenToTheCues = true
             playCue()
         }
@@ -655,34 +651,23 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, GADB
     }
     
     //MARK: Ad MobStuff
-    func adViewDidReceiveAd(_ bannerView: GADBannerView)
+    func loadFullScreenAd(adUnitID: String)
     {
-        if canShowAds
-        {
-            ///banner.isHidden = false
-        } else
-        {
-            ///banner.isHidden = true
+        Task { @MainActor [weak self] in
+            do {
+                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
+                print ("Interstitial Ad is Received: BashPlayVC")
+                self?.interstitial = ad
+                self?.interstitialAdReady = true
+            } catch {
+                self?.interstitialAdReady = false
+            }
         }
     }
     
-    func interstitialDidReceiveAd(_ ad: GADInterstitial)
+    func createFullScreenAd()
     {
-        print ("Interstitial Ad is Received: BashPlayVC")
-        interstitialAdReady = true
-    }
-    
-    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError)
-    {
-        ///banner.isHidden = true
-    }
-    
-    func createFullScreenAd() -> GADInterstitial
-    {
-        let interstitialAd = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/8760361314")
-        interstitialAd.load(GADRequest())
-        interstitialAd.delegate = self
-        return interstitialAd
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/8760361314")
     }
     
     func showAdsInGame ()
@@ -699,12 +684,11 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, GADB
     
     func showFullScreenAd ()
     {
-        if (interstitial.isReady)
-        {
-            interstitialAdReady = false
-            interstitial.present(fromRootViewController: self)
-            interstitial = createFullScreenAd()
-        }
+        guard let ad = interstitial else { return }
+        interstitial = nil
+        interstitialAdReady = false
+        ad.present(from: self)
+        createFullScreenAd()
     }
 }
 
@@ -713,11 +697,6 @@ extension String
     subscript (i: Int) -> Character
     {
         return self[index(startIndex, offsetBy: i)]
-    }
-    
-    subscript (i: Int) -> String
-    {
-        return String(self[i] as Character)
     }
     
     subscript (r: Range<Int>) -> String

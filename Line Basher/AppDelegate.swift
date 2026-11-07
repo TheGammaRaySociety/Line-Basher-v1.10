@@ -9,8 +9,6 @@
 import UIKit
 import CoreData
 import GoogleMobileAds
-import Fabric
-import Crashlytics
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate
@@ -19,10 +17,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool
     {
-        GADMobileAds.configure(withApplicationID: "ca-app-pub-8101436191593741~3668064119")
-        Fabric.with([Crashlytics.self])
+        MobileAds.shared.start(completionHandler: nil)
 
         return true
     }
@@ -45,7 +42,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-      appStoreReviewCoordinator.incrementRunCounter()
     }
 
     func applicationWillTerminate(_ application: UIApplication)
