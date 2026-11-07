@@ -153,6 +153,8 @@ extension IAPHelper: SKPaymentTransactionObserver {
       case .purchasing:
         print ("paymentQueue .purchasing")
         break
+      @unknown default:
+        break
       }
     }
   }
@@ -182,7 +184,7 @@ extension IAPHelper: SKPaymentTransactionObserver {
   {
     print("fail...")
     if let transactionError = transaction.error as NSError? {
-      if transactionError.code != SKError.paymentCancelled.rawValue {
+      if transactionError.code != SKError.Code.paymentCancelled.rawValue {
         print("Transaction Error: \(transaction.error?.localizedDescription ?? dbObj.stringErrorString)")
       }
     }

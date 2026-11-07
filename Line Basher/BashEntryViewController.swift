@@ -155,6 +155,9 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UIT
                     self.recordLineButton.setTitle("Speech recognition not yet authorized", for: .disabled)
                     self.recordCueButton.isEnabled = false
                     self.recordCueButton.setTitle("Speech recognition not yet authorized", for: .disabled)
+                @unknown default:
+                    self.recordLineButton.isEnabled = false
+                    self.recordCueButton.isEnabled = false
                 }
             }
         }
@@ -173,7 +176,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UIT
         let audioSession = AVAudioSession.sharedInstance()
         try audioSession.setCategory(.playAndRecord, mode: .measurement)              //Just added with: ... might be a problem.
         //try audioSession.setCategory(AVAudioSessionCategoryRecord)
-        try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
+        try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         
@@ -242,7 +245,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UIT
         let audioSession = AVAudioSession.sharedInstance()
         try audioSession.setCategory(.playAndRecord, mode: .measurement)
         //try audioSession.setCategory(AVAudioSessionCategoryRecord)
-        try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
+        try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         
@@ -926,14 +929,16 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UIT
     //MARK: Ad MobStuff
     func loadFullScreenAd(adUnitID: String)
     {
-        Task { @MainActor [weak self] in
-            do {
-                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
-                print ("Interstitial Ad is Received: BashEntryVC")
-                self?.interstitial = ad
-                self?.interstitialAdReady = true
-            } catch {
-                self?.interstitialAdReady = false
+        InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, _ in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if let ad = ad {
+                    print ("Interstitial Ad is Received: BashEntryVC")
+                    self.interstitial = ad
+                    self.interstitialAdReady = true
+                } else {
+                    self.interstitialAdReady = false
+                }
             }
         }
     }

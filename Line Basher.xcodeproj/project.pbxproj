@@ -492,7 +492,7 @@
 			versionGroupType = wrapper.xcdatamodel;
 		};
 /* End XCVersionGroup section */
-	};
+
 /* Begin XCRemoteSwiftPackageReference section */
 		A1B1C1D31E92C28200C6F026 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -511,5 +511,6 @@
 			productName = GoogleMobileAds;
 		};
 /* End XCSwiftPackageProductDependency section */
+	};
 	rootObject = E2A3A94D1E92C28200C6F026 /* Project object */;
 }
