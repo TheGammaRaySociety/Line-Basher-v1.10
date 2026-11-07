@@ -136,6 +136,8 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
                         
                     case .notDetermined:
                         self.btnListenToLine.isEnabled = false
+                    @unknown default:
+                        self.btnListenToLine.isEnabled = false
                     }
                 }
         }
@@ -170,7 +172,7 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
         
         try audioSession.setCategory(.playAndRecord, mode: .measurement)
         //try audioSession.setCategory(AVAudioSessionCategoryRecord)
-        try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
+        try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         
@@ -653,14 +655,16 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
     //MARK: Ad MobStuff
     func loadFullScreenAd(adUnitID: String)
     {
-        Task { @MainActor [weak self] in
-            do {
-                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
-                print ("Interstitial Ad is Received: BashPlayVC")
-                self?.interstitial = ad
-                self?.interstitialAdReady = true
-            } catch {
-                self?.interstitialAdReady = false
+        InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, _ in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if let ad = ad {
+                    print ("Interstitial Ad is Received: BashPlayVC")
+                    self.interstitial = ad
+                    self.interstitialAdReady = true
+                } else {
+                    self.interstitialAdReady = false
+                }
             }
         }
     }
@@ -703,7 +707,7 @@ extension String
     {
         let start = index(startIndex, offsetBy: r.lowerBound)
         let end = index(startIndex, offsetBy: r.upperBound - r.lowerBound)
-        return String(self[Range(start ..< end)])
+        return String(self[start..<end])
     }
 }
 

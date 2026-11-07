@@ -39,7 +39,7 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
         banner.delegate = self
         banner.adUnitID = "ca-app-pub-8101436191593741/5144797310"
         banner.rootViewController = self
-        banner.load(Request())
+        banner.loadRequest(Request())
         
         loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
         
@@ -162,13 +162,15 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     
     func loadFullScreenAd(adUnitID: String)
     {
-        Task { @MainActor [weak self] in
-            do {
-                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
-                self?.interstitial = ad
-                self?.interstitialAdReady = true
-            } catch {
-                self?.interstitialAdReady = false
+        InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, _ in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if let ad = ad {
+                    self.interstitial = ad
+                    self.interstitialAdReady = true
+                } else {
+                    self.interstitialAdReady = false
+                }
             }
         }
     }
@@ -181,7 +183,7 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     func showAdsInGame ()
     {
         canShowAds = true
-        banner.load(Request())
+        banner.loadRequest(Request())
     }
     
     func hideAdsInGame ()
