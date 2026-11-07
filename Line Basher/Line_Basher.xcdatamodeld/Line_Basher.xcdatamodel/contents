@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16E195" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Characters" representedClassName="Characters" syncable="YES" codeGenerationType="class">
+        <attribute name="charName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="spare1" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="spare2" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="work" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="workID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="Line" representedClassName="Line" syncable="YES" codeGenerationType="class">
+        <attribute name="act" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="blocking" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cueText" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lineID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lineOrder" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lineText" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mainChar" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="motivation" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="scene" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="spare2" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="work" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Scene" representedClassName="Scene" syncable="YES" codeGenerationType="class">
+        <attribute name="act" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mainChar" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="scene" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sceneID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="spare1" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="spare2" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="work" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Work" representedClassName="Work" syncable="YES" codeGenerationType="class">
+        <attribute name="mainChar" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="spare1" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="spare2" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="workID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Characters" positionX="-54" positionY="18" width="128" height="120"/>
+        <element name="Line" positionX="-18" positionY="63" width="128" height="210"/>
+        <element name="Scene" positionX="-36" positionY="108" width="128" height="150"/>
+        <element name="Work" positionX="-63" positionY="-18" width="128" height="120"/>
+    </elements>
+</model>
