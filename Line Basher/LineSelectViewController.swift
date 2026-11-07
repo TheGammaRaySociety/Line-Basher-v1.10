@@ -13,13 +13,13 @@ import Speech
 import StoreKit
 import GoogleMobileAds
 
-class LineSelectViewController: UIViewController, UITableViewDelegate, GADBannerViewDelegate, UITextFieldDelegate, GADInterstitialDelegate
+class LineSelectViewController: UIViewController, UITableViewDelegate, BannerViewDelegate, UITextFieldDelegate
 {
-    var interstitial: GADInterstitial!
+    var interstitial: InterstitialAd?
     var canShowAds: Bool = true
     var interstitialAdReady: Bool = false
 
-    @IBOutlet weak var banner: GADBannerView!
+    @IBOutlet weak var banner: BannerView!
     @IBOutlet weak var constraintBottomLineTable: NSLayoutConstraint!
     @IBOutlet weak var btnMoveItems: UIBarButtonItem!
     
@@ -46,12 +46,9 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
         banner.delegate = self
         banner.adUnitID = "ca-app-pub-8101436191593741/5144797310"
         banner.rootViewController = self
-        banner.load(GADRequest())
+        banner.load(Request())
         
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/6621530511")
-        interstitial.delegate = self
-        let request = GADRequest()
-        interstitial.load(request)
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
         
         tblLines.dataSource = self
         tblLines.delegate = self
@@ -62,8 +59,8 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
         txtAct.text = dbObj.currentScene.act
         txtScene.text = dbObj.currentScene.scene
             
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         addDoneButtonOnKeyboard()
         
@@ -90,8 +87,8 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
     
     override func viewWillDisappear(_ animated: Bool)
     {
-        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
 
         if interstitialCount >= numberOfLineSelectVCExitsBeforeInterstitial && (!fullVersionPurchased || showAdsEvenWhenPaid)
         {
@@ -112,21 +109,18 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
         btnMoveItems.title = "Arrange"
     }
     
-    override func shouldPerformSegue(withIdentifier identifier: String?, sender: Any?) -> Bool
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool
     {
-        if let ident = identifier
+        if identifier == "NewLineSegue"
         {
-            if ident == "NewLineSegue"
+            if !fullVersionPurchased && dbObj.listOfLines.count > listOfLinesWithoutPay
             {
-                if !fullVersionPurchased && dbObj.listOfLines.count > listOfLinesWithoutPay
-                {
-                    return false
-                }
-                if txtAct.isFirstResponder || txtScene.isFirstResponder
-                {
-                    //ResignFirstResponder is performed in the didSelect function of the tableview
-                    return false
-                }
+                return false
+            }
+            if txtAct.isFirstResponder || txtScene.isFirstResponder
+            {
+                //ResignFirstResponder is performed in the didSelect function of the tableview
+                return false
             }
         }
         return true
@@ -224,10 +218,10 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
     func addDoneButtonOnKeyboard()
     {
         let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
-        doneToolbar.barStyle       = UIBarStyle.default
-        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
-        //let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItemStyle.done, target: self, action: #selector(doneButtonIsPressed))
-        let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItemStyle.done, target: self, action: #selector(finishButtonIsPressed))
+        doneToolbar.barStyle       = .default
+        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        //let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItem.Style.done, target: self, action: #selector(doneButtonIsPressed))
+        let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItem.Style.done, target: self, action: #selector(finishButtonIsPressed))
 
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
@@ -258,14 +252,14 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
         {
             if dbObj.checkIfActAndSceneAreTheSame(checkScene: tempSceneInfo)
             {
-                let alert = UIAlertController(title: "Warning!", message: "You already have Act \(tempSceneInfo.act) and Scene \(tempSceneInfo.scene). You can MERGE the lines together or CANCEL. If you MERGE, this action cannot be undone.", preferredStyle: UIAlertControllerStyle.alert)
-                alert.addAction(UIAlertAction(title: "Merge", style: UIAlertActionStyle.default, handler: { action in
+                let alert = UIAlertController(title: "Warning!", message: "You already have Act \(tempSceneInfo.act) and Scene \(tempSceneInfo.scene). You can MERGE the lines together or CANCEL. If you MERGE, this action cannot be undone.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "Merge", style: UIAlertAction.Style.default, handler: { action in
                     self.mergeDataBaseWithSameActAndScene()
                     dbObj.loadLineArrayFromDB()
                     dbObj.reNumberLinesInArrayAndSaveToDataBase()
                     self.prepLineTableView()
                 }))
-                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: { action in
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.default, handler: { action in
                     self.txtAct.text = dbObj.currentScene.act
                     self.txtScene.text = dbObj.currentScene.scene
                 }))
@@ -332,7 +326,7 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
     }
 
     //MARK: Ad MobStuff
-    func adViewDidReceiveAd(_ bannerView: GADBannerView)
+    func bannerViewDidReceiveAd(_ bannerView: BannerView)
     {
         if canShowAds
         {
@@ -343,29 +337,33 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
         }
     }
     
-    func interstitialDidReceiveAd(_ ad: GADInterstitial)
-    {
-        //print ("Interstitial Ad is Received")
-        interstitialAdReady = true
-    }
-    
-    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError)
+    func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error)
     {
         banner.isHidden = true
     }
     
-    func createFullScreenAd() -> GADInterstitial
+    func loadFullScreenAd(adUnitID: String)
     {
-        let interstitialAd = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/8760361314")
-        interstitialAd.load(GADRequest())
-        interstitialAd.delegate = self
-        return interstitialAd
+        Task { @MainActor [weak self] in
+            do {
+                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
+                self?.interstitial = ad
+                self?.interstitialAdReady = true
+            } catch {
+                self?.interstitialAdReady = false
+            }
+        }
+    }
+    
+    func createFullScreenAd()
+    {
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/8760361314")
     }
     
     func showAdsInGame ()
     {
         canShowAds = true
-        banner.load(GADRequest())
+        banner.load(Request())
     }
     
     func hideAdsInGame ()
@@ -376,12 +374,11 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, GADBanner
     
     func showFullScreenAd ()
     {
-        if (interstitial.isReady)
-        {
-            interstitialAdReady = false
-            interstitial.present(fromRootViewController: self)
-            interstitial = createFullScreenAd()
-        }
+        guard let ad = interstitial else { return }
+        interstitial = nil
+        interstitialAdReady = false
+        ad.present(from: self)
+        createFullScreenAd()
     }
 }
 
@@ -417,7 +414,7 @@ extension LineSelectViewController: UITableViewDataSource
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: "WorkCell") else
                 {
                     // Never fails:
-                    return UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "WorkCell")
+                    return UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "WorkCell")
                 }
                 return cell
             }()
@@ -461,7 +458,7 @@ extension LineSelectViewController: UITableViewDataSource
         }
     }
 
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath)
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath)
     {
         let line = dbObj.listOfLines[indexPath.row]
         print ("Verify Delete Text = \(dbObj.listOfLines[indexPath.row])")
@@ -607,7 +604,7 @@ extension LineSelectViewController: UITableViewDataSource
         toggleMoveButton()
     }
     
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle
     {
         if indexPath.row == 0
         {

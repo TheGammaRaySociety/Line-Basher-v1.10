@@ -56,8 +56,8 @@ class SettingsViewController: UIViewController, UITextFieldDelegate
     {
         spnrPurchase.alpha = 0
         spnrPurchase.stopAnimating()
-        btnRestorePurchases.setTitle("Restore", for: UIControlState.normal)
-        btnGetFullVersion.setTitle("Purchase", for: UIControlState.normal)
+        btnRestorePurchases.setTitle("Restore", for: UIControl.State.normal)
+        btnGetFullVersion.setTitle("Purchase", for: UIControl.State.normal)
         checkFullVersionGraphics()
     }
     
@@ -99,9 +99,9 @@ class SettingsViewController: UIViewController, UITextFieldDelegate
     func addDoneButtonOnKeyboard()
     {
         let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
-        doneToolbar.barStyle       = UIBarStyle.default
-        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItemStyle.done, target: self, action: #selector(doneButtonIsPressed))
+        doneToolbar.barStyle       = .default
+        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItem.Style.done, target: self, action: #selector(doneButtonIsPressed))
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
@@ -205,7 +205,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate
     {
         spnrPurchase.alpha = 1
         spnrPurchase.startAnimating()
-        btnRestorePurchases.setTitle("Working", for: UIControlState.normal)
+        btnRestorePurchases.setTitle("Working", for: UIControl.State.normal)
         LineBasherProducts.store.restorePurchases()
     }
     
@@ -213,7 +213,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate
     {
         spnrPurchase.alpha = 1
         spnrPurchase.startAnimating()
-        btnGetFullVersion.setTitle("Working", for: UIControlState.normal)
+        btnGetFullVersion.setTitle("Working", for: UIControl.State.normal)
         if LineBasherProducts.store.listOfProducts.count > 0
         {
             for p in LineBasherProducts.store.listOfProducts
@@ -231,8 +231,8 @@ class SettingsViewController: UIViewController, UITextFieldDelegate
         viewGetFullVersionDesc.alpha = 1
         btnGetFullVersion.alpha = 1
         btnRestorePurchases.alpha = 1
-        btnGetFullVersion.setTitle("Purchase", for: UIControlState.normal)
-        btnRestorePurchases.setTitle("Restore", for: UIControlState.normal)
+        btnGetFullVersion.setTitle("Purchase", for: UIControl.State.normal)
+        btnRestorePurchases.setTitle("Restore", for: UIControl.State.normal)
         spnrPurchase.stopAnimating()
         spnrPurchase.alpha = 0
     }

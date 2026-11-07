@@ -7,21 +7,20 @@
 //
 
 import UIKit
+import WebKit
 
-class WebHelpViewController: UIViewController, UIWebViewDelegate
+class WebHelpViewController: UIViewController
 {
 
-    @IBOutlet weak var wbHelpView: UIWebView!
+    @IBOutlet weak var wbHelpView: WKWebView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        wbHelpView.delegate = self
-        
         //1. Load web site into my web view
         let myURL = URL(string: "http://gammaraysoftware.com/LineBasherHelp.html")
         let myURLRequest:URLRequest = URLRequest(url: myURL!)
-        wbHelpView.loadRequest(myURLRequest)
+        wbHelpView.load(myURLRequest)
     }
 
     override func didReceiveMemoryWarning() {

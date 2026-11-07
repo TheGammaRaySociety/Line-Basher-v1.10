@@ -13,17 +13,17 @@ import Speech
 import StoreKit
 import GoogleMobileAds
 
-class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UITextFieldDelegate, GADInterstitialDelegate, UITableViewDelegate
+class SceneSelectViewController: UIViewController, BannerViewDelegate, UITextFieldDelegate, UITableViewDelegate
 {
 
     @IBOutlet weak var txtNameOfWork: UITextField!
     @IBOutlet weak var txtMainCharacter: UITextField!
     
-    @IBOutlet weak var banner: GADBannerView!
+    @IBOutlet weak var banner: BannerView!
     @IBOutlet weak var btnSceneSettings: UIBarButtonItem!
     @IBOutlet weak var btnEditScenePosition: UIBarButtonItem!
     
-    var interstitial: GADInterstitial!
+    var interstitial: InterstitialAd?
     var canShowAds: Bool = true
     var interstitialAdReady: Bool = false
 
@@ -44,12 +44,9 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
         banner.delegate = self
         banner.adUnitID = "ca-app-pub-8101436191593741/5144797310"
         banner.rootViewController = self
-        banner.load(GADRequest())
+        banner.load(Request())
         
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/6621530511")
-        interstitial.delegate = self
-        let request = GADRequest()
-        interstitial.load(request)
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
         
         tblScenes.dataSource = self
         tblScenes.delegate = self
@@ -82,8 +79,8 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
             txtMainCharacter.clearsOnBeginEditing = false
         }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowInScene), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideInScene), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowInScene), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideInScene), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool)
@@ -115,8 +112,8 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
         btnSceneSettings.isEnabled = true
         tblScenes.isEditing = false
         btnEditScenePosition.title = "Arrange"
-        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     func ensureNewEntryCellIsLocatedCorrectly()
@@ -135,17 +132,14 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
         }
     }
     
-    override func shouldPerformSegue(withIdentifier identifier: String?, sender: Any?) -> Bool
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool
     {
-        if let ident = identifier
+        if identifier == "GoToLines"
         {
-            if ident == "GoToLines"
+            if txtNameOfWork.isFirstResponder || txtMainCharacter.isFirstResponder
             {
-                if txtNameOfWork.isFirstResponder || txtMainCharacter.isFirstResponder
-                {
-                    //ResignFirstResponder is performed in the didSelect of the tableview.
-                    return false
-                }
+                //ResignFirstResponder is performed in the didSelect of the tableview.
+                return false
             }
         }
         return true
@@ -204,14 +198,14 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
         {
             if dbObj.checkIfWorkAndMainCharAreTheSame(refWork: modifiedWork.name, refMainChar: modifiedWork.mainChar)
             {
-                let alert = UIAlertController(title: "Warning!", message: "You already have Work \(modifiedWork.name) and Character \(modifiedWork.mainChar). You can MERGE the lines together or CANCEL. If you MERGE, this action cannot be undone.", preferredStyle: UIAlertControllerStyle.alert)
-                alert.addAction(UIAlertAction(title: "Merge", style: UIAlertActionStyle.default, handler: { action in
+                let alert = UIAlertController(title: "Warning!", message: "You already have Work \(modifiedWork.name) and Character \(modifiedWork.mainChar). You can MERGE the lines together or CANCEL. If you MERGE, this action cannot be undone.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "Merge", style: UIAlertAction.Style.default, handler: { action in
                     dbObj.mergeTwoWorksTogether(originalWork: modifiedWork, workGettingMerged: dbObj.currentWork)
                     dbObj.loadSceneArrayFromDB()
                     self.prepSceneTableView()
                     dbObj.currentWork = modifiedWork
                }))
-                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: { action in
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.default, handler: { action in
                     self.txtNameOfWork.text = dbObj.currentWork.name
                     self.txtMainCharacter.text = dbObj.currentWork.mainChar
                 }))
@@ -250,7 +244,7 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
     }
     
     //MARK: Ad MobStuff
-    func adViewDidReceiveAd(_ bannerView: GADBannerView)
+    func bannerViewDidReceiveAd(_ bannerView: BannerView)
     {
         if canShowAds
         {
@@ -261,28 +255,33 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
         }
     }
     
-    func interstitialDidReceiveAd(_ ad: GADInterstitial)
-    {
-        interstitialAdReady = true
-    }
-    
-    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError)
+    func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error)
     {
         banner.isHidden = true
     }
     
-    func createFullScreenAd() -> GADInterstitial
+    func loadFullScreenAd(adUnitID: String)
     {
-        let interstitialAd = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/8760361314")
-        interstitialAd.load(GADRequest())
-        interstitialAd.delegate = self
-        return interstitialAd
+        Task { @MainActor [weak self] in
+            do {
+                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
+                self?.interstitial = ad
+                self?.interstitialAdReady = true
+            } catch {
+                self?.interstitialAdReady = false
+            }
+        }
+    }
+    
+    func createFullScreenAd()
+    {
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/8760361314")
     }
     
     func showAdsInGame ()
     {
         canShowAds = true
-        banner.load(GADRequest())
+        banner.load(Request())
     }
     
     func hideAdsInGame ()
@@ -293,12 +292,11 @@ class SceneSelectViewController: UIViewController, GADBannerViewDelegate, UIText
     
     func showFullScreenAd ()
     {
-        if (interstitial.isReady)
-        {
-            interstitialAdReady = false
-            interstitial.present(fromRootViewController: self)
-            interstitial = createFullScreenAd()
-        }
+        guard let ad = interstitial else { return }
+        interstitial = nil
+        interstitialAdReady = false
+        ad.present(from: self)
+        createFullScreenAd()
     }
 }
 
@@ -363,7 +361,7 @@ extension SceneSelectViewController: UITableViewDataSource
         ///return cell
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath)
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath)
     {
         
         let scene = dbObj.listOfScenes[indexPath.row]
@@ -479,7 +477,7 @@ extension SceneSelectViewController: UITableViewDataSource
         toggleArrangeScenes()
     }
     
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle
     {
         if indexPath.row == 0
         {

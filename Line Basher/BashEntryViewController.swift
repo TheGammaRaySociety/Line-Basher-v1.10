@@ -14,7 +14,7 @@ import StoreKit
 import GoogleMobileAds
 import CoreFoundation
 
-class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GADBannerViewDelegate, UITextFieldDelegate, GADInterstitialDelegate, UITableViewDelegate, AVSpeechSynthesizerDelegate
+class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UITextFieldDelegate, UITableViewDelegate, AVSpeechSynthesizerDelegate
 {
     // MARK: Properties
     
@@ -34,7 +34,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
 
     var canShowAds: Bool = true
     var interstitialAdReady: Bool = false
-    var interstitial: GADInterstitial!
+    var interstitial: InterstitialAd?
     
     var originalCenterLocation: CGPoint = CGPoint.zero
     
@@ -91,15 +91,12 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
         ///banner.rootViewController = self
        ///banner.load(GADRequest())
         
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/6621530511")
-        interstitial.delegate = self
-        let request = GADRequest()
-        interstitial.load(request)
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
 
         addDoneButtonOnKeyboard()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool)
@@ -174,9 +171,8 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
         }
         
         let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)              //Just added with: ... might be a problem.
+        try audioSession.setCategory(.playAndRecord, mode: .measurement)              //Just added with: ... might be a problem.
         //try audioSession.setCategory(AVAudioSessionCategoryRecord)
-        try audioSession.setMode(AVAudioSessionModeMeasurement)
         try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
@@ -244,9 +240,8 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
         }
         
         let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        try audioSession.setCategory(.playAndRecord, mode: .measurement)
         //try audioSession.setCategory(AVAudioSessionCategoryRecord)
-        try audioSession.setMode(AVAudioSessionModeMeasurement)
         try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
@@ -340,7 +335,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
             audioEngine.reset()
             
             recordLineButton.isEnabled = false
-            self.recordLineButton.setTitle("Record", for: UIControlState.normal)
+            self.recordLineButton.setTitle("Record", for: UIControl.State.normal)
             if cueTextView.isFirstResponder
             {
                 cueTextView.resignFirstResponder()
@@ -370,7 +365,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
                 self.previousLineText = self.lineTextView.text
             }
             try! startRecordingLine()
-            self.recordLineButton.setTitle("End.", for: UIControlState.normal)
+            self.recordLineButton.setTitle("End.", for: UIControl.State.normal)
             UIView.animate(withDuration: 0.3, animations: {
                 self.btnPrevLine.alpha = 0
                 self.btnNextLine.alpha = 0
@@ -421,7 +416,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
             audioEngine.reset()
             
             recordCueButton.isEnabled = false
-            self.recordCueButton.setTitle("Record", for: UIControlState.normal)
+            self.recordCueButton.setTitle("Record", for: UIControl.State.normal)
             if cueTextView.isFirstResponder
             {
                 cueTextView.resignFirstResponder()
@@ -451,7 +446,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
                 self.previousCueText = self.cueTextView.text
             }
             try! startRecordingCue()
-            self.recordCueButton.setTitle("End.", for: UIControlState.normal)
+            self.recordCueButton.setTitle("End.", for: UIControl.State.normal)
             UIView.animate(withDuration: 0.3, animations: {
                 self.btnPrevLine.alpha = 0
                 self.btnNextLine.alpha = 0
@@ -495,12 +490,12 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
         if playBackLine
         {
             playBackLine = false
-            btnPlayBack.setTitle("Play Back", for: UIControlState.normal)
+            btnPlayBack.setTitle("Play Back", for: UIControl.State.normal)
             speechSynthesizer.pauseSpeaking(at: .immediate)
             //speechSynthesizer.stopSpeaking(at: .immediate)
         } else
         {
-            btnPlayBack.setTitle("Stop", for: UIControlState.normal)
+            btnPlayBack.setTitle("Stop", for: UIControl.State.normal)
             playBackLine = true
             speakLineAloud()
         }
@@ -550,9 +545,9 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
             audioEngine.reset()
 
             recordCueButton.isEnabled = true
-            self.recordCueButton.setTitle("Record", for: UIControlState.normal)
+            self.recordCueButton.setTitle("Record", for: UIControl.State.normal)
             recordLineButton.isEnabled = true
-            self.recordLineButton.setTitle("Record", for: UIControlState.normal)
+            self.recordLineButton.setTitle("Record", for: UIControl.State.normal)
             
             if cueTextView.isFirstResponder
             {
@@ -567,7 +562,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
         if speechSynthesizer.isSpeaking
         {
             playBackLine = false
-            btnPlayBack.setTitle("Play Back", for: UIControlState.normal)
+            btnPlayBack.setTitle("Play Back", for: UIControl.State.normal)
             speechSynthesizer.pauseSpeaking(at: .immediate)
         }
     }
@@ -823,9 +818,9 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
     func addDoneButtonOnKeyboard()
     {
         let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
-        doneToolbar.barStyle       = UIBarStyle.default
-        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItemStyle.done, target: self, action: #selector(doneButtonIsPressed))
+        doneToolbar.barStyle       = .default
+        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem  = UIBarButtonItem(title: "Finish", style: UIBarButtonItem.Style.done, target: self, action: #selector(doneButtonIsPressed))
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
@@ -849,8 +844,8 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
     override func viewWillDisappear(_ animated: Bool)
     {
         let _ = checkIfSomthingChanged()
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: self.view.window)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: self.view.window)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: self.view.window)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: self.view.window)
     }
     
     @objc func keyboardWillShow(sender: NSNotification)
@@ -887,7 +882,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
         let offsetBufferForLine: CGFloat = 25                //This is to ensure the buttons are not above the top.
         
         ///if let keyboardSize = (sender.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue
-        if let keyboardSize = (sender.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+        if let keyboardSize = (sender.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
         {
             let keyboardHeight: CGFloat = keyboardSize.height
             
@@ -929,26 +924,23 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
     
 
     //MARK: Ad MobStuff
-    func adViewDidReceiveAd(_ bannerView: GADBannerView)
+    func loadFullScreenAd(adUnitID: String)
     {
+        Task { @MainActor [weak self] in
+            do {
+                let ad = try await InterstitialAd.load(with: adUnitID, request: Request())
+                print ("Interstitial Ad is Received: BashEntryVC")
+                self?.interstitial = ad
+                self?.interstitialAdReady = true
+            } catch {
+                self?.interstitialAdReady = false
+            }
+        }
     }
     
-    func interstitialDidReceiveAd(_ ad: GADInterstitial)
+    func createFullScreenAd()
     {
-        print ("Interstitial Ad is Received: BashEntryVC")
-        interstitialAdReady = true
-    }
-    
-    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError)
-    {
-    }
-    
-    func createFullScreenAd() -> GADInterstitial
-    {
-        let interstitialAd = GADInterstitial(adUnitID: "ca-app-pub-8101436191593741/8760361314")
-        interstitialAd.load(GADRequest())
-        interstitialAd.delegate = self
-        return interstitialAd
+        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/8760361314")
     }
     
     func showAdsInGame ()
@@ -965,12 +957,11 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, GAD
     
     func showFullScreenAd ()
     {
-        if (interstitial.isReady)
-        {
-            interstitialAdReady = false
-            interstitial.present(fromRootViewController: self)
-            interstitial = createFullScreenAd()
-        }
+        guard let ad = interstitial else { return }
+        interstitial = nil
+        interstitialAdReady = false
+        ad.present(from: self)
+        createFullScreenAd()
     }
 }
 
