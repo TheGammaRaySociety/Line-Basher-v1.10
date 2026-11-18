@@ -39,7 +39,7 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
         banner.delegate = self
         banner.adUnitID = "ca-app-pub-8101436191593741/5144797310"
         banner.rootViewController = self
-        banner.loadRequest(Request())
+        banner.load(Request())
         
         loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
         
@@ -183,7 +183,7 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     func showAdsInGame ()
     {
         canShowAds = true
-        banner.loadRequest(Request())
+        banner.load(Request())
     }
     
     func hideAdsInGame ()
