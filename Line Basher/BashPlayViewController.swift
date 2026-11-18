@@ -546,7 +546,7 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
         {
             hintText = Array(txtLineText.text)
         }
-        var realLineText: Array = Array(dbObj.currentLine.lineText)
+        let realLineText: Array = Array(dbObj.currentLine.lineText)
         
         print (dbObj.currentLine.lineText.count)
         if maxHintChars < noSpaceCharsInString()
