@@ -91,7 +91,10 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UIT
         ///banner.rootViewController = self
        ///banner.load(GADRequest())
         
-        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        if adsEnabled
+        {
+            loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        }
 
         addDoneButtonOnKeyboard()
         
@@ -929,6 +932,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UIT
     //MARK: Ad MobStuff
     func loadFullScreenAd(adUnitID: String)
     {
+        guard adsEnabled else { return }
         InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -962,6 +966,7 @@ class BashEntryViewController: UIViewController, SFSpeechRecognizerDelegate, UIT
     
     func showFullScreenAd ()
     {
+        guard adsEnabled else { return }
         guard let ad = interstitial else { return }
         interstitial = nil
         interstitialAdReady = false

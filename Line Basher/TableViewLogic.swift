@@ -13,6 +13,7 @@ import UIKit
 //FIXME: If this is to be an inapp purchase, this needs to be false. If this is to be purchased app, then this needs to be true.
 var fullVersionPurchased: Bool = false
 var showAdsEvenWhenPaid: Bool = false
+var adsEnabled: Bool = false        //Set to true to request and show AdMob banners and full-screen ads.
 
 var listOfWorksWithoutPay: Int = 1
 var listOfScenesWithoutPay: Int = Int.max
