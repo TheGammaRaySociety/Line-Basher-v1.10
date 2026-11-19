@@ -179,10 +179,10 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
                 newLineFound = true
                 if refLineText == dbObj.stringEnterNewLine && dbObj.listOfLines.count > listOfLinesWithoutPay && !fullVersionPurchased
                 {
-                    dbObj.listOfLines[dbObj.masterListCount].lineText = dbObj.stringLinePurchaseFullVersion
+                    dbObj.listOfLines[iCount].lineText = dbObj.stringLinePurchaseFullVersion
                 } else if refLineText == dbObj.stringLinePurchaseFullVersion && dbObj.listOfLines.count <= listOfLinesWithoutPay && !fullVersionPurchased
                 {
-                    dbObj.listOfLines[dbObj.masterListCount].lineText = dbObj.stringEnterNewLine
+                    dbObj.listOfLines[iCount].lineText = dbObj.stringEnterNewLine
                 }
             }
             iCount = iCount + 1
