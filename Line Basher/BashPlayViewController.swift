@@ -89,7 +89,10 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
         ///banner.rootViewController = self
         ///banner.load(GADRequest())
         
-        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        if adsEnabled
+        {
+            loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        }
         
         btnSpeakCue.setTitle("Hear Cues", for: UIControl.State.normal)
         appStoreReviewCoordinator.incrementEventCounter()
@@ -145,11 +148,11 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
     
     override func viewWillDisappear(_ animated: Bool)
     {
-        if interstitialCount >= numberOfLineSelectVCExitsBeforeInterstitial && (!fullVersionPurchased || showAdsEvenWhenPaid)
+        if adsEnabled && interstitialCount >= numberOfLineSelectVCExitsBeforeInterstitial && (!fullVersionPurchased || showAdsEvenWhenPaid)
         {
             showFullScreenAd()
             interstitialCount = 0
-        } else
+        } else if adsEnabled
         {
             print ("interstitialCount = \(interstitialCount), in BashPlayViewController.")
             interstitialCount = interstitialCount + 1
@@ -655,6 +658,7 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
     //MARK: Ad MobStuff
     func loadFullScreenAd(adUnitID: String)
     {
+        guard adsEnabled else { return }
         InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -688,6 +692,7 @@ class BashPlayViewController: UIViewController, SFSpeechRecognizerDelegate, UITe
     
     func showFullScreenAd ()
     {
+        guard adsEnabled else { return }
         guard let ad = interstitial else { return }
         interstitial = nil
         interstitialAdReady = false

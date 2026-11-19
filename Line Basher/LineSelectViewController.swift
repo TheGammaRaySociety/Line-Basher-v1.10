@@ -46,9 +46,15 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
         banner.delegate = self
         banner.adUnitID = "ca-app-pub-8101436191593741/5144797310"
         banner.rootViewController = self
-        banner.load(Request())
-        
-        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        if adsEnabled
+        {
+            banner.load(Request())
+            loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        } else
+        {
+            banner.alpha = 0
+            constraintBottomLineTable.constant = 0
+        }
         
         tblLines.dataSource = self
         tblLines.delegate = self
@@ -69,9 +75,10 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
     
     override func viewWillAppear(_ animated: Bool)
     {
-        if (fullVersionPurchased && !showAdsEvenWhenPaid)
+        if !adsEnabled || (fullVersionPurchased && !showAdsEvenWhenPaid)
         {
             banner.alpha = 0
+            banner.isHidden = true
             constraintBottomLineTable.constant = 0
         } else
         {
@@ -90,11 +97,11 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
 
-        if interstitialCount >= numberOfLineSelectVCExitsBeforeInterstitial && (!fullVersionPurchased || showAdsEvenWhenPaid)
+        if adsEnabled && interstitialCount >= numberOfLineSelectVCExitsBeforeInterstitial && (!fullVersionPurchased || showAdsEvenWhenPaid)
         {
             showFullScreenAd()
             interstitialCount = 0
-        } else
+        } else if adsEnabled
         {
             interstitialCount = interstitialCount + 1
         }
@@ -328,7 +335,7 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
     //MARK: Ad MobStuff
     func bannerViewDidReceiveAd(_ bannerView: BannerView)
     {
-        if canShowAds
+        if adsEnabled && canShowAds
         {
             banner.isHidden = false
         } else
@@ -344,6 +351,7 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
     
     func loadFullScreenAd(adUnitID: String)
     {
+        guard adsEnabled else { return }
         InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -365,7 +373,10 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
     func showAdsInGame ()
     {
         canShowAds = true
-        banner.load(Request())
+        if adsEnabled
+        {
+            banner.load(Request())
+        }
     }
     
     func hideAdsInGame ()
@@ -376,6 +387,7 @@ class LineSelectViewController: UIViewController, UITableViewDelegate, BannerVie
     
     func showFullScreenAd ()
     {
+        guard adsEnabled else { return }
         guard let ad = interstitial else { return }
         interstitial = nil
         interstitialAdReady = false

@@ -39,9 +39,15 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
         banner.delegate = self
         banner.adUnitID = "ca-app-pub-8101436191593741/5144797310"
         banner.rootViewController = self
-        banner.load(Request())
-        
-        loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        if adsEnabled
+        {
+            banner.load(Request())
+            loadFullScreenAd(adUnitID: "ca-app-pub-8101436191593741/6621530511")
+        } else
+        {
+            banner.alpha = 0
+            constraintTblWorkBottom.constant = 0
+        }
         
         LineBasherProducts.store.requestProducts(completionHandler: {_,_ in })
         
@@ -55,9 +61,10 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     
     override func viewWillAppear(_ animated: Bool)
     {
-        if (fullVersionPurchased && !showAdsEvenWhenPaid)
+        if !adsEnabled || (fullVersionPurchased && !showAdsEvenWhenPaid)
         {
             banner.alpha = 0
+            banner.isHidden = true
             constraintTblWorkBottom.constant = 0
         } else
         {
@@ -146,7 +153,7 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     //MARK: Ad MobStuff
     func bannerViewDidReceiveAd(_ bannerView: BannerView)
     {
-        if canShowAds
+        if adsEnabled && canShowAds
         {
             banner.isHidden = false
         } else
@@ -162,6 +169,7 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     
     func loadFullScreenAd(adUnitID: String)
     {
+        guard adsEnabled else { return }
         InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -183,7 +191,10 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     func showAdsInGame ()
     {
         canShowAds = true
-        banner.load(Request())
+        if adsEnabled
+        {
+            banner.load(Request())
+        }
     }
     
     func hideAdsInGame ()
@@ -194,6 +205,7 @@ class BashTitleViewController: UIViewController, BannerViewDelegate, UITextField
     
     func showFullScreenAd ()
     {
+        guard adsEnabled else { return }
         guard let ad = interstitial else { return }
         interstitial = nil
         interstitialAdReady = false
