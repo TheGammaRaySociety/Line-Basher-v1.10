@@ -47,12 +47,17 @@ open class IAPHelper : NSObject
         print("Previously purchased: \(productIdentifier)")
         if productIdentifier.hasSuffix("FullVersion")
         {
-            fullVersionPurchased = true               ///Should be true for release of final product. False is used only for debug.
+            fullVersionPurchased = true
+            UserDefaults.standard.set("1", forKey: "fullVersionPurchased")
+            UserDefaults.standard.synchronize()
         }
       } else
       {
-        //FIXME: This should be set to false if doing InApp purchase.
-        fullVersionPurchased = true
+        // A purchase already loaded from UserDefaults must not be cleared here.
+        if !fullVersionPurchased
+        {
+            fullVersionPurchased = false
+        }
         print("Not purchased: \(productIdentifier)")
       }
     }
@@ -198,6 +203,11 @@ extension IAPHelper: SKPaymentTransactionObserver {
  
     purchasedProductIdentifiers.insert(identifier)
     UserDefaults.standard.set(true, forKey: identifier)
+    if identifier == LineBasherProducts.iAP_FullVersion || identifier.hasSuffix(LineBasherProducts.iAP_FullVersion)
+    {
+      fullVersionPurchased = true
+      UserDefaults.standard.set("1", forKey: "fullVersionPurchased")
+    }
     UserDefaults.standard.synchronize()
     NotificationCenter.default.post(name: NSNotification.Name(rawValue: IAPHelper.IAPHelperPurchaseNotification), object: identifier)
   }

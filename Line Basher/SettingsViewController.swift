@@ -218,7 +218,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate
         {
             for p in LineBasherProducts.store.listOfProducts
             {
-                if p.localizedTitle == "FullVersion"
+                if p.productIdentifier == LineBasherProducts.iAP_FullVersion
                 {
                     LineBasherProducts.store.buyProduct(p)
                  }
