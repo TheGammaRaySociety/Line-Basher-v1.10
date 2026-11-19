@@ -11,7 +11,7 @@ import Foundation
 import UIKit
 
 //FIXME: If this is to be an inapp purchase, this needs to be false. If this is to be purchased app, then this needs to be true.
-var fullVersionPurchased: Bool = true
+var fullVersionPurchased: Bool = false
 var showAdsEvenWhenPaid: Bool = false
 
 var listOfWorksWithoutPay: Int = 1
@@ -1395,8 +1395,7 @@ class dataBaseObject
             fullVersionPurchased = true
         } else
         {
-            //FIXME: This should be false if using InApp Purchase
-            fullVersionPurchased = true
+            fullVersionPurchased = false
         }
         
         ///Must be sure debugModeIsOn = false before release.
@@ -1489,7 +1488,7 @@ class dataBaseObject
         {
             for p in LineBasherProducts.store.listOfProducts
             {
-                if p.localizedTitle == "FullVersion"
+                if p.productIdentifier == LineBasherProducts.iAP_FullVersion
                 {
                     LineBasherProducts.store.buyProduct(p)
                 }
