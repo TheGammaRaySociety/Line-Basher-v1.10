@@ -15,8 +15,8 @@ var fullVersionPurchased: Bool = false
 var showAdsEvenWhenPaid: Bool = false
 
 var listOfWorksWithoutPay: Int = 1
-var listOfScenesWithoutPay: Int = 3
-var listOfLinesWithoutPay: Int = 15
+var listOfScenesWithoutPay: Int = Int.max
+var listOfLinesWithoutPay: Int = Int.max
 var numberOfLineSelectVCExitsBeforeInterstitial: Int = 3
 var interstitialCount: Int = 0
 
@@ -149,9 +149,9 @@ class dataBaseObject
         if fullVersionPurchased
         {
             stringWorkPurchaseFullVersion = stringNewWorkTapHere
-            stringScenePurchaseFullVersion = stringNewSceneTapHere
-            stringLinePurchaseFullVersion = stringNewLineTapHere
         }
+        stringScenePurchaseFullVersion = stringNewSceneTapHere
+        stringLinePurchaseFullVersion = stringEnterNewLine
         
     }
     
