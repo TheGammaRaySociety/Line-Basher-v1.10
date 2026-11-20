@@ -9,11 +9,11 @@
 /* Begin PBXBuildFile section */
 		299A60541EB6727A001906CC /* BashEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 299A60531EB6727A001906CC /* BashEntryViewController.swift */; };
 		29A9FD9F1F108F6E009FEBF5 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29A9FD9E1F108F6E009FEBF5 /* StoreKit.framework */; };
+		29AB9A5C1F00CC8A009D81F2 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29AB9A5B1F00CC8A009D81F2 /* SettingsViewController.swift */; };
+		29B6042A1F187F4B00D93257 /* WebHelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B604291F187F4B00D93257 /* WebHelpViewController.swift */; };
 		A1B1C1D21E92C28200C6F026 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1B1C1D11E92C28200C6F026 /* PrivacyInfo.xcprivacy */; };
 		A1B1C1D51E92C28200C6F026 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = A1B1C1D41E92C28200C6F026 /* GoogleMobileAds */; };
 		A1B1C1D71E92C28200C6F026 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B1C1D61E92C28200C6F026 /* SceneDelegate.swift */; };
-		29AB9A5C1F00CC8A009D81F2 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29AB9A5B1F00CC8A009D81F2 /* SettingsViewController.swift */; };
-		29B6042A1F187F4B00D93257 /* WebHelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B604291F187F4B00D93257 /* WebHelpViewController.swift */; };
 		E20A74261ED9D7BB009EF976 /* BasherTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20A74241ED9D7BB009EF976 /* BasherTableViewCell.swift */; };
 		E220606E1F76D3E40051F5D8 /* AppStoreReviewCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E220606D1F76D3E40051F5D8 /* AppStoreReviewCoordinator.swift */; };
 		E2761E611F04A50A0087FF2E /* SceneTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2761E601F04A50A0087FF2E /* SceneTableViewCell.swift */; };
@@ -35,10 +35,10 @@
 /* Begin PBXFileReference section */
 		299A60531EB6727A001906CC /* BashEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BashEntryViewController.swift; sourceTree = "<group>"; };
 		29A9FD9E1F108F6E009FEBF5 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		A1B1C1D11E92C28200C6F026 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = "Line Basher/PrivacyInfo.xcprivacy"; sourceTree = "<group>"; };
-		A1B1C1D61E92C28200C6F026 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "Line Basher/SceneDelegate.swift"; sourceTree = "<group>"; };
 		29AB9A5B1F00CC8A009D81F2 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		29B604291F187F4B00D93257 /* WebHelpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebHelpViewController.swift; sourceTree = "<group>"; };
+		A1B1C1D11E92C28200C6F026 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = "Line Basher/PrivacyInfo.xcprivacy"; sourceTree = "<group>"; };
+		A1B1C1D61E92C28200C6F026 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "Line Basher/SceneDelegate.swift"; sourceTree = "<group>"; };
 		E20A74241ED9D7BB009EF976 /* BasherTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasherTableViewCell.swift; sourceTree = "<group>"; };
 		E220606D1F76D3E40051F5D8 /* AppStoreReviewCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppStoreReviewCoordinator.swift; sourceTree = SOURCE_ROOT; };
 		E2761E601F04A50A0087FF2E /* SceneTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneTableViewCell.swift; sourceTree = "<group>"; };
@@ -202,15 +202,15 @@
 			buildConfigurationList = E2A3A9501E92C28200C6F026 /* Build configuration list for PBXProject "Line Basher" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
-			packageReferences = (
-				A1B1C1D31E92C28200C6F026 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
-			);
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
 			mainGroup = E2A3A94C1E92C28200C6F026;
+			packageReferences = (
+				A1B1C1D31E92C28200C6F026 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			productRefGroup = E2A3A9561E92C28200C6F026 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -382,6 +382,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -400,7 +401,6 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
-				DEAD_CODE_STRIPPING = YES;
 			};
 			name = Release;
 		};
@@ -411,6 +411,7 @@
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = EZT7MKHZB2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -422,6 +423,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.13;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gammaraysoftware.scriptbasher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -437,6 +439,7 @@
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = EZT7MKHZB2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -448,6 +451,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.13;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gammaraysoftware.scriptbasher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -479,20 +483,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCVersionGroup section */
-		E2A3A95F1E92C28200C6F026 /* Line_Basher.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				E2A3A9601E92C28200C6F026 /* Line_Basher.xcdatamodel */,
-			);
-			currentVersion = E2A3A9601E92C28200C6F026 /* Line_Basher.xcdatamodel */;
-			name = Line_Basher.xcdatamodeld;
-			path = "Line Basher/Line_Basher.xcdatamodeld";
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		A1B1C1D31E92C28200C6F026 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -511,6 +501,20 @@
 			productName = GoogleMobileAds;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		E2A3A95F1E92C28200C6F026 /* Line_Basher.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				E2A3A9601E92C28200C6F026 /* Line_Basher.xcdatamodel */,
+			);
+			currentVersion = E2A3A9601E92C28200C6F026 /* Line_Basher.xcdatamodel */;
+			name = Line_Basher.xcdatamodeld;
+			path = "Line Basher/Line_Basher.xcdatamodeld";
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = E2A3A94D1E92C28200C6F026 /* Project object */;
 }
